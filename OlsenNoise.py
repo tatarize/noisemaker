@@ -9,6 +9,11 @@ _blur_kernel = ((1, 1, 1),
 _blur_edge = 2  # extra pixels are needed for the blur (3 - 1).
 
 
+
+def required_dim(dim):
+    return dim + _blur_edge + _SCALE_FACTOR
+
+
 def noise(x, y, width, height):
     """
     returns a block of Olsen Noise within the given parameters.
@@ -22,12 +27,8 @@ def noise(x, y, width, height):
     r_width = required_dim(width)
     r_height = required_dim(height)
     pixels = np.zeros((r_width, r_height), dtype='uint8')
-    _olsen_noise(pixels, x, y)
+    _olsen_noise(pixels, x, y, width, height)
     return pixels[:width, :height]
-
-
-def required_dim(dim):
-    return dim + _blur_edge + _SCALE_FACTOR
 
 
 def _olsen_noise(pixels, x=0, y=0, width=None, height=None, iteration=_MAX_ITERATIONS):
@@ -48,8 +49,8 @@ def _olsen_noise(pixels, x=0, y=0, width=None, height=None, iteration=_MAX_ITERA
                  ((width + x_remainder) // _SCALE_FACTOR) + _blur_edge,
                  ((height + y_remainder) // _SCALE_FACTOR) + _blur_edge, iteration - 1) # Recursive scope call.
 
-    scale_shift(pixels, width, height, _SCALE_FACTOR, x_remainder, y_remainder)
-    apply_blur(pixels, width - _blur_edge, height - _blur_edge)
+    scale_shift(pixels, width + _blur_edge, height + _blur_edge, _SCALE_FACTOR, x_remainder, y_remainder)
+    apply_blur(pixels, width + _blur_edge, height + _blur_edge)
     speckle(pixels, x, y, width, height, iteration)
 
 

@@ -10,20 +10,6 @@ from OlsenNoise import noise
 
 class TestNoise(unittest.TestCase):
 
-    def test_same_noise_as_basic(self):
-        c = noise(0, 0, 3, 3)
-        self.assertEqual(c[0,0],123)
-        self.assertEqual(c[0,1],123)
-        self.assertEqual(c[0,2],122)
-
-        self.assertEqual(c[1,0],122)
-        self.assertEqual(c[1,1],122)
-        self.assertEqual(c[1,2],123)
-
-        self.assertEqual(c[2,0],123)
-        self.assertEqual(c[2,1],122)
-        self.assertEqual(c[2,2],123)
-
     def test_deterministic_noise(self):
         c = noise(0, 0, 102, 102)
         d = noise(1, 1, 100, 100)
@@ -55,22 +41,20 @@ class TestNoise(unittest.TestCase):
 
     def test_position_shift_x(self):
         for dx in range(30):
-            dy = 0
-            c = noise(50, 50, 102, 102)
-            d = noise(50 + dx, 50 + dy, 102, 102)
-            q = c[dx:50+dx, dx:50+dx] - d[0:50, 0:50]
+            a = noise(50, 50, 102, 102)
+            b = noise(50 + dx, 50, 102, 102)
+            q = a[dx:50+dx, :50] - b[0:50, 0:50]
             if np.any(q):
-                print(q, dx, dy)
+                print(q, dx)
             self.assertFalse(np.any(q))
 
     def test_position_shift_y(self):
-        dx = 0
         for dy in range(30):
-            c = noise(50, 50, 102, 102)
-            d = noise(50 + dx, 50 + dy, 102, 102)
-            q = c[dx:50+dx, dx:50+dx] - d[0:50, 0:50]
+            a = noise(50, 50, 102, 102)
+            b = noise(50, 50 + dy, 102, 102)
+            q = a[:50, dy:50+dy] - b[0:50, 0:50]
             if np.any(q):
-                print(q, dx, dy)
+                print(q, dy)
             self.assertFalse(np.any(q))
 
     def test_position_shift_angle(self):
@@ -83,16 +67,16 @@ class TestNoise(unittest.TestCase):
             self.assertFalse(np.any(q))
 
     def test_deterministic_nature(self):
-        n = 100
+        n = 1
         while True:
-            ax = random.randint(-100, 100)
-            ay = random.randint(-100, 100)
-            aw = random.randint(0, 100)
-            ah = random.randint(0, 100)
-            bx = random.randint(-100, 100)
-            by = random.randint(-100, 100)
-            bw = random.randint(0, 100)
-            bh = random.randint(0, 100)
+            ax = random.randint(-1000, 1000)
+            ay = random.randint(-1000, 1000)
+            aw = random.randint(0, 1000)
+            ah = random.randint(0, 1000)
+            bx = random.randint(-1000, 1000)
+            by = random.randint(-1000, 1000)
+            bw = random.randint(0, 1000)
+            bh = random.randint(0, 1000)
 
             x0 = max(ax, bx)
             y0 = max(ay, by)
@@ -113,5 +97,5 @@ class TestNoise(unittest.TestCase):
                     print(q)
                 self.assertFalse(np.any(q))
                 n += 1
-                if n > 100:
+                if n > 50:
                     break
