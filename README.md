@@ -12,6 +12,20 @@ Image.fromarray(noise((250, 100), (0, 200), transpose=True)).save("noise2.png")
 
 The `noise()` algorithm requires only the first shape parameter. The `transpose` flag is to covert it into an image ready format.
 
+```python
+def noise(shape, position=None, **kwargs):
+    """
+    Returns a block of noise within the specific parameters.
+
+    :param shape: shape of the noise block
+    :param position: requested position within the noise.
+    :param kwargs:  'iteration'='0-7' number of iterations for the requested noise value.
+                    'kernel'=GAUSSIAN, BOX use gaussian or box matrix.
+                    'transpose'='True' transpose result.
+    :return:
+    """
+```
+
 # Tiling
 
 * ![noise0](https://user-images.githubusercontent.com/3302478/101229669-34737000-3656-11eb-9820-2e18fae18918.png)
