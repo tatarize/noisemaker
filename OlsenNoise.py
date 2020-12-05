@@ -13,7 +13,7 @@ def required_dim(dim):
     return dim + _blur_edge + _SCALE_FACTOR
 
 
-def noise(x, y, width, height):
+def noise(x, y, width, height, iteration=_MAX_ITERATIONS):
     """
     returns a block of Olsen Noise within the given parameters.
 
@@ -26,7 +26,7 @@ def noise(x, y, width, height):
     r_width = required_dim(width)
     r_height = required_dim(height)
     pixels = np.zeros((r_width,r_height), dtype='uint8')
-    _olsen_noise(pixels, x, y, width, height)
+    _olsen_noise(pixels, x, y, width, height, iteration=iteration)
     return np.transpose(pixels[:width, :height])
 
 
