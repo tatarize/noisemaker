@@ -2,6 +2,15 @@
 
 Olsen Noise algorithm for infinite scoped deterministic fractal noise. The noise is deterministic so it's perfectly for tiling and returning to the same postion and having the same regenerated noise. The algorithm is infinite and scoped so only enough values as needed are generated.
 
+# Installing
+
+`pip install noisemaker`
+
+Dependencies:
+`numpy`
+
+# Example
+
 ```python
 from PIL import Image
 from noisemaker import noise
