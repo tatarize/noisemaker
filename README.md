@@ -22,16 +22,18 @@ Note these are three different images. Simply adjacent in the requested space, s
 ```python
 from noisemaker import noise
 from PIL import Image
-Image.fromarray(OlsenNoise.noise(500, 500, iteration=5)).save("noise-5.png")
+Image.fromarray(noise(500, 500, iteration=5)).save("noise-5.png")
 ```
 
-![noise-5](https://user-images.githubusercontent.com/3302478/101229929-751fb900-3657-11eb-9bd7-c84373bc79bd.png)
+![noise-5](https://user-images.githubusercontent.com/3302478/101246313-5c4eec00-36c7-11eb-9d4f-49e4d080ddca.png)
+
 
 There is also a gaussian kernel availible:
 
 ```python
 from noisemaker import noise, GAUSSIAN
 from PIL import Image
-Image.fromarray(OlsenNoise.noise(500, 500, iteration=5, kernel=GAUSSIAN)).save("noise-5g.png")
+Image.fromarray(noise(500, 500, iteration=5, kernel=GAUSSIAN)).save("noise-5g.png")
 ```
 
+![noise-5g](https://user-images.githubusercontent.com/3302478/101246329-738dd980-36c7-11eb-8419-89d7b9379207.png)
