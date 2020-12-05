@@ -10,73 +10,33 @@ from OlsenNoise import noise
 
 class TestNoise(unittest.TestCase):
 
-    def test_deterministic_noise(self):
-        c = noise(0, 0, 102, 102)
-        d = noise(1, 1, 100, 100)
-        q = c[1:91, 1:91] - d[0:90, 0:90]
-        if np.any(q):
-            print(q)
+    def test_regular_movement(self):
+        ax = random.randint(-100, 100)
+        ay = random.randint(-100, 100)
+
+        j = noise((1, 100), (ax, ay))
+        k = noise((1, 100), (ax, ay + 1))  # K is moved down by 1.
+        q = j[0, 1:100] - k[0, 0:99]  # move was in the y direction.
         self.assertFalse(np.any(q))
 
-        c = noise(0, 0, 102, 102)
-        d = noise(5, 5, 100, 100)
-        q = c[5:95, 5:95] - d[0:90, 0:90]
-        if np.any(q):
-            print(q)
+        j = noise((100, 1), (ax, ay))
+        k = noise((100, 1), (ax + 1, ay))  # K is moved right by 1.
+        q = j[1:100, 0] - k[0:99, 0]  # move was in the x direction
         self.assertFalse(np.any(q))
 
-        c = noise(0, 0, 102, 102)
-        d = noise(10, 10, 102, 102)
-        q = c[10:60, 10:60] - d[0:50, 0:50]
-        if np.any(q):
-            print(q)
-        self.assertFalse(np.any(q))
-
-        c = noise(50, 50, 102, 102)
-        d = noise(60, 60, 102, 102)
-        q = c[10:60, 10:60] - d[0:50, 0:50]
-        if np.any(q):
-            print(q)
-        self.assertFalse(np.any(q))
-
-    def test_position_shift_x(self):
-        for dx in range(30):
-            a = noise(50, 50, 102, 102)
-            b = noise(50 + dx, 50, 102, 102)
-            q = a[dx:50+dx, :50] - b[0:50, 0:50]
-            if np.any(q):
-                print(q, dx)
-            self.assertFalse(np.any(q))
-
-    def test_position_shift_y(self):
-        for dy in range(30):
-            a = noise(50, 50, 102, 102)
-            b = noise(50, 50 + dy, 102, 102)
-            q = a[:50, dy:50+dy] - b[0:50, 0:50]
-            if np.any(q):
-                print(q, dy)
-            self.assertFalse(np.any(q))
-
-    def test_position_shift_angle(self):
-        for delta in range(50):
-            a = noise(50, 50, 102, 102)
-            b = noise(50 + delta, 50 + delta, 102, 102)
-            q = a[delta:50+delta, delta:50+delta] - b[0:50, 0:50]
-            if np.any(q):
-                print(q, delta)
-            self.assertFalse(np.any(q))
-
-    def test_deterministic_nature(self):
-        n = 3
+    def test_deterministic_slices(self):
+        n = 20
         while True:
-            ax = random.randint(-1000, 1000)
-            ay = random.randint(-1000, 1000)
-            aw = random.randint(0, 1000)
-            ah = random.randint(0, 1000)
-            bx = random.randint(-1000, 1000)
-            by = random.randint(-1000, 1000)
-            bw = random.randint(0, 1000)
-            bh = random.randint(0, 1000)
+            ox = random.randint(-10000, 10000)
+            oy = random.randint(-10000, 10000)
+            ax = random.randint(-100, 100)
+            ay = random.randint(-100, 100)
+            aw = random.randint(0, 100)
+            ah = random.randint(0, 100)
+            bx = random.randint(-100, 100)
+            by = random.randint(-100, 100)
+            bw = random.randint(0, 100)
+            bh = random.randint(0, 100)
 
             x0 = max(ax, bx)
             y0 = max(ay, by)
@@ -84,8 +44,9 @@ class TestNoise(unittest.TestCase):
             y1 = min(ay + ah, by + bh)
 
             if x0 < x1 and y0 < y1:
-                a = noise(ax, ay, aw, ah)
-                b = noise(bx, by, bw, bh)
+                # Only overlapped bounds count as a test.
+                a = noise((aw, ah), (ax + ox, ay + oy))
+                b = noise((bw, bh), (bx + ox, by + oy))
                 axr = slice(x0 - ax, x1 - ax)
                 ayr = slice(y0 - ay, y1 - ay)
                 bxr = slice(x0 - bx, x1 - bx)
@@ -93,8 +54,41 @@ class TestNoise(unittest.TestCase):
                 a_part = a[axr, ayr]
                 b_part = b[bxr, byr]
                 q = a_part - b_part
-                if np.any(q):
-                    print(q)
+                self.assertFalse(np.any(q))
+                n -= 1
+                if n <= 0:
+                    break
+
+    def test_deterministic_gaussian_slices(self):
+        n = 20
+        while True:
+            ox = random.randint(-10000, 10000)
+            oy = random.randint(-10000, 10000)
+            ax = random.randint(-100, 100)
+            ay = random.randint(-100, 100)
+            aw = random.randint(0, 100)
+            ah = random.randint(0, 100)
+            bx = random.randint(-100, 100)
+            by = random.randint(-100, 100)
+            bw = random.randint(0, 100)
+            bh = random.randint(0, 100)
+
+            x0 = max(ax, bx)
+            y0 = max(ay, by)
+            x1 = min(ax + aw, bx + bw)
+            y1 = min(ay + ah, by + bh)
+
+            if x0 < x1 and y0 < y1:
+                # Only overlapped bounds count as a test.
+                a = noise((aw, ah), (ax + ox, ay + oy), gaussian=True)
+                b = noise((bw, bh), (bx + ox, by + oy), gaussian=True)
+                axr = slice(x0 - ax, x1 - ax)
+                ayr = slice(y0 - ay, y1 - ay)
+                bxr = slice(x0 - bx, x1 - bx)
+                byr = slice(y0 - by, y1 - by)
+                a_part = a[axr, ayr]
+                b_part = b[bxr, byr]
+                q = a_part - b_part
                 self.assertFalse(np.any(q))
                 n -= 1
                 if n <= 0:
