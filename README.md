@@ -12,12 +12,15 @@ Image.fromarray(noise((250, 100), (0, 200), transpose=True)).save("noise2.png")
 
 The `noise()` algorithm requires only the first shape parameter. The `transpose` flag is to covert it into an image ready format.
 
+# Tiling
+
 * ![noise0](https://user-images.githubusercontent.com/3302478/101229669-34737000-3656-11eb-9820-2e18fae18918.png)
 * ![noise1](https://user-images.githubusercontent.com/3302478/101229676-4523e600-3656-11eb-8ce1-74062438f93b.png)
 * ![noise2](https://user-images.githubusercontent.com/3302478/101229681-48b76d00-3656-11eb-8641-8cb1cdd680ee.png)
 
 Note these are three different images. Simply adjacent in the requested space, so they stack.
 
+# Box Kernel (Default)
 
 ```python
 from noisemaker import noise
