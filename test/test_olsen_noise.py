@@ -67,7 +67,7 @@ class TestNoise(unittest.TestCase):
             self.assertFalse(np.any(q))
 
     def test_deterministic_nature(self):
-        n = 1
+        n = 3
         while True:
             ax = random.randint(-1000, 1000)
             ay = random.randint(-1000, 1000)
@@ -96,6 +96,6 @@ class TestNoise(unittest.TestCase):
                 if np.any(q):
                     print(q)
                 self.assertFalse(np.any(q))
-                n += 1
-                if n > 50:
+                n -= 1
+                if n <= 0:
                     break

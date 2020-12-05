@@ -9,7 +9,6 @@ _blur_kernel = ((1, 1, 1),
 _blur_edge = 2  # extra pixels are needed for the blur (3 - 1).
 
 
-
 def required_dim(dim):
     return dim + _blur_edge + _SCALE_FACTOR
 
@@ -26,16 +25,12 @@ def noise(x, y, width, height):
     """
     r_width = required_dim(width)
     r_height = required_dim(height)
-    pixels = np.zeros((r_width, r_height), dtype='uint8')
+    pixels = np.zeros((r_width,r_height), dtype='uint8')
     _olsen_noise(pixels, x, y, width, height)
-    return pixels[:width, :height]
+    return np.transpose(pixels[:width, :height])
 
 
-def _olsen_noise(pixels, x=0, y=0, width=None, height=None, iteration=_MAX_ITERATIONS):
-    if width is None:
-        width = pixels.shape[0]
-    if height is None:
-        height = pixels.shape[1]
+def _olsen_noise(pixels, x, y, width, height, iteration=_MAX_ITERATIONS):
     if iteration == 0:
         # Base case.
         speckle(pixels, x, y, width, height, iteration)
@@ -60,21 +55,20 @@ def _scale_shift_np(pixels, width, height, factor, shift_x, shift_y):
     """
     r = pixels[shift_x:width + shift_x, shift_y:height + shift_y]
     kron = np.kron(r, np.ones((factor, factor)))
-    pixels[:width * 2, :height * 2] = kron[
-                                      :min(width * 2, pixels.shape[0]),
-                                      :min(height * 2, pixels.shape[1])]
+    pixels[:height * 2,:width * 2] = kron[
+                                      :min(height * 2, pixels.shape[1]),
+                                      :min(width * 2, pixels.shape[0])]
 
 
 def scale_shift(pixels, width, height, factor, shift_x, shift_y):
     for y in range(height-1, -1, -1):
         for x in range(width-1, -1, -1):
-            pixels[x, y] = pixels[(x+shift_x) // factor, (y+shift_y) // factor]
+            pixels[x,y] = pixels[(x+shift_x) // factor, (y+shift_y) // factor]
 
 
 def speckle(pixels, x_within_field, y_within_field, width, height, iteration):
-    for y in range(height):
-        for x in range(width):
-            pixels[x,y] += (hash_random(x + x_within_field, y + y_within_field, iteration) & (1 << (7 - iteration)))
+    for i, m in np.ndenumerate(pixels[:width:, :height:]):
+        pixels[i] += (hash_random(i[0] + x_within_field, i[1] + y_within_field, iteration) & (1 << (7 - iteration)))
 
 
 def apply_noise(pixels, x, y, width, height, iteration):
@@ -96,33 +90,6 @@ def apply_noise(pixels, x, y, width, height, iteration):
                     1 << (7 - iteration))
 
 
-def convolve2(pixels, width, height, matrix=_blur_kernel, offset=0, x=0, y=0):
-    """
-     Memory Free In-Place Convolution.
-
-     It is modified to not actually do all the color blending work. The values
-     passed to it are between 0-255 So it does a proper average.
-
-    :param pixels:  pixels to be modified (pass by reference).
-    :param offset:  offset within the pixel array to call zero.
-    :param x: the start x value.
-    :param y: the start y value.
-    :param width: the width of blocks to be used for the convolution.
-    :param height: the height of the convolution area.
-    :param matrix: matrix of the convolution.
-    :return:
-    """
-    # index is where we are in the pixels. All equal 0 for our use. Y=0, X=0, offset = 0.
-    for y in range(height):  # iterate the y values. adding stride to index each time.
-        for x in range(width):
-            pixels[x, y] = convolve_p(pixels, (x, y), matrix)
-
-
-def apply_blur(pixels, width, height, matrix=_blur_kernel, offset=0, x=0, y=0):
-    for index, m in np.ndenumerate(pixels[:width, :height]):
-        pixels[index] = convolve_p(pixels, index, matrix)
-
-
 def crimp(color):
     """
     crimps the values between 255 and 0. Required for some other convolutions like emboss where they go out of register.
@@ -136,7 +103,12 @@ def crimp(color):
     return int(color)
 
 
-def convolve_p(pixels, index, matrix):
+def apply_blur(pixels, width, height, matrix=_blur_kernel):
+    for index, m in np.ndenumerate(pixels[:width,:height]):
+        pixels[index] = convolve(pixels, index, matrix)
+
+
+def convolve(pixels, index, matrix):
     """
     Performs the convolution on that pixel by the given matrix. Note all values within the matrix are down and to the
     right from the current pixel. None are up or to the left. This is by design.
@@ -151,7 +123,7 @@ def convolve_p(pixels, index, matrix):
         for k in range(len(matrix[j])):  # iterates the matrix[] within.
             factor = matrix[j][k]  # gets the multiple from that matrix.
             parts += factor  # keeps a running total for the parts.
-            sum += factor * pixels[index[0] + j, index[1] + k]
+            sum += factor * pixels[index[0] + k, index[1] + j]
     if parts == 0:
         return crimp(sum)
     return crimp(sum // parts)
