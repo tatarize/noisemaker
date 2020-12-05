@@ -64,3 +64,12 @@ from PIL import Image
 Image.fromarray(noise((500, 500), iteration=5, kernel=GAUSSIAN)).save("noise-5g.png")
 ```
 ![noise-5g](https://user-images.githubusercontent.com/3302478/101246608-47735800-36c9-11eb-8d56-0ac4b4432dbd.png)
+
+
+# Contributing
+
+The testing is pretty robust and impossible to pass without the algorithm working.
+
+There are a number of speed advancements that could be made to the algorithm. If faster and still passing the tests any PRs will generally be accepted.
+
+Other noise algorithms can be included or other interesting kernels.
