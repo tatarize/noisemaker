@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from OlsenNoise import noise
+from noisemaker import *
 
 
 class TestNoise(unittest.TestCase):
@@ -80,8 +80,8 @@ class TestNoise(unittest.TestCase):
 
             if x0 < x1 and y0 < y1:
                 # Only overlapped bounds count as a test.
-                a = noise((aw, ah), (ax + ox, ay + oy), gaussian=True)
-                b = noise((bw, bh), (bx + ox, by + oy), gaussian=True)
+                a = noise((aw, ah), (ax + ox, ay + oy), kernel=GAUSSIAN)
+                b = noise((bw, bh), (bx + ox, by + oy), kernel=GAUSSIAN)
                 axr = slice(x0 - ax, x1 - ax)
                 ayr = slice(y0 - ay, y1 - ay)
                 bxr = slice(x0 - bx, x1 - bx)
