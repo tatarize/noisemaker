@@ -28,12 +28,13 @@ Image.fromarray(noise(500, 500, iteration=5)).save("noise-5.png")
 ![noise-5](https://user-images.githubusercontent.com/3302478/101246313-5c4eec00-36c7-11eb-9d4f-49e4d080ddca.png)
 
 
-There is also a gaussian kernel availible:
+# Gaussian Kernel
+
+There is also a gaussian kernel availible, which is about a third the blur factor of the default box blur:
 
 ```python
 from noisemaker import noise, GAUSSIAN
 from PIL import Image
 Image.fromarray(noise(500, 500, iteration=5, kernel=GAUSSIAN)).save("noise-5g.png")
 ```
-
-![noise-5g](https://user-images.githubusercontent.com/3302478/101246329-738dd980-36c7-11eb-8419-89d7b9379207.png)
+![noise-5g](https://user-images.githubusercontent.com/3302478/101246608-47735800-36c9-11eb-8d56-0ac4b4432dbd.png)
