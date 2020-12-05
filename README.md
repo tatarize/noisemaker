@@ -1,6 +1,6 @@
 # NoiseMaker
 
-Currently using Olsen Noise algorithm for infinite scoped deterministic fractal noise.
+Olsen Noise algorithm for infinite scoped deterministic fractal noise. The noise is deterministic so it's perfectly for tiling and returning to the same postion and having the same regenerated noise. The algorithm is infinite and scoped so only enough values as needed are generated.
 
 ```python
 from PIL import Image
@@ -35,6 +35,6 @@ There is also a gaussian kernel availible, which is about a third the blur facto
 ```python
 from noisemaker import noise, GAUSSIAN
 from PIL import Image
-Image.fromarray(noise(500, 500, iteration=5, kernel=GAUSSIAN)).save("noise-5g.png")
+Image.fromarray(noise((500, 500), iteration=5, kernel=GAUSSIAN)).save("noise-5g.png")
 ```
 ![noise-5g](https://user-images.githubusercontent.com/3302478/101246608-47735800-36c9-11eb-8d56-0ac4b4432dbd.png)
